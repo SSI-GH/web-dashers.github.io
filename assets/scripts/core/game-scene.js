@@ -5024,6 +5024,7 @@ _buildSettingsPopup() {
     };
 
     const buildVisualPage = (container) => {
+        const spacingY = 54; // Уменьшаем вертикальный шаг для всей вкладки
         createToggle(container, column1X, startY, "Show Hitboxes", 
             () => window.showHitboxes, 
             (v) => window.showHitboxes = v,
