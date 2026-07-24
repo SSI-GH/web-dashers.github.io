@@ -3608,7 +3608,8 @@ this._menuUpdateLogBtn = this.add.image(screenWidth - 30 - 50, 33, "GJ_WebSheet"
       if (!this._menuActive && !this._slideIn) {
         const isPracticeMode = this._practicedMode.togglePracticeMode();
         if (this._checkpointBtnContainer) {
-          this._checkpointBtnContainer.setVisible(isPracticeMode);
+            this._checkpointBtnContainer.setVisible(isPracticeMode);
+            this._checkpointBtnContainer.setAlpha(window.hidePracticeUI ? 0 : 1);
         }
         if (this._practiceModeBarContainer) {
           this._practiceModeBarContainer.setVisible(isPracticeMode);
@@ -4486,10 +4487,12 @@ this._menuUpdateLogBtn = this.add.image(screenWidth - 30 - 50, 33, "GJ_WebSheet"
       this._player?.setDeathAnimationPaused?.(false);
       this._player2?.setDeathAnimationPaused?.(false);
       this._paused = false;
-      this._pauseBtn.setVisible(true).setAlpha(75 / 255);
+      this._pauseBtn.setVisible(true).setAlpha(window.hidePauseBtn ? 0 : 75 / 255);
       if (!this._state.isDead || this._practicedMode?.practiceMode) {
         this._audio.resumeMusic();
         this._audio._ensureCorrectMusicMode();
+          if (this._checkpointBtnContainer) {
+      this._checkpointBtnContainer.setAlpha(window.hidePracticeUI ? 0 : 1);
       }
       if (this._pauseContainer) {
         this._pauseContainer.destroy();
@@ -4802,6 +4805,8 @@ _buildSettingsPopup() {
         "Show Percentage": "Shows the percentage you are at in a level.",
         "Percentage Decimals": "Shows decimals in level progress.",
         "Hitboxes on Death": "Shows hitboxes upon death in both normal and practice mode.",
+        "Hide Pause Button": "Hides the pause button during gameplay.",
+        "Hide Practice UI": "Hides the checkpoint buttons in practice mode.",
     };
 
     const createInfoButton = (container, x, y, infoTextOrKey, scale) => {
@@ -5090,6 +5095,28 @@ _buildSettingsPopup() {
             true,
             "Enable Orb Guide"
         );
+        // Чекбокс для скрытия кнопки паузы с мгновенным обновлением на экране
+        createToggle(container, column2X, startY + (spacingY * 5), "Hide Pause Button", 
+            () => window.hidePauseBtn, 
+            (v) => { 
+                window.hidePauseBtn = v; 
+                if (this._pauseBtn) {
+                    this._pauseBtn.setAlpha(v ? 0 : 0.75);
+                }
+            },
+            null, 25, true, "Hide Pause Button"
+        );
+
+        // Чекбокс для скрытия кнопок практики с мгновенным обновлением на экране
+        createToggle(container, column2X, startY + (spacingY * 6), "Hide Practice UI", 
+            () => window.hidePracticeUI, 
+            (v) => { 
+                window.hidePracticeUI = v; 
+                if (this._practiceBtn) this._practiceBtn.setAlpha(v ? 0 : 0.75);
+                if (this._removeBtn) this._removeBtn.setAlpha(v ? 0 : 0.75);
+            },
+            null, 25, true, "Hide Practice UI"
+        );
     };
 
     const buildAdvancedPage = (container) => {
@@ -5139,6 +5166,8 @@ _buildSettingsPopup() {
         startPosSwitcher: window.startPosSwitcher,
         hitboxTrail: window.showHitboxTrail,
         showFPS: this._fpsText.visible,
+        hidePauseBtn: window.hidePauseBtn,
+        hidePracticeUI: window.hidePracticeUI,
         solidWaveTrail: window.solidWave,
         noclipAccuracy: window.noClipAccuracy,
         hitboxesOnDeath: window.hitboxesOnDeath,
@@ -5168,6 +5197,8 @@ _buildSettingsPopup() {
         startPosSwitcher: false,
         hitboxTrail: false,
         showFPS: false,
+        hidePauseBtn: false,
+        hidePracticeUI: false,
         solidWaveTrail: false,
         noclipAccuracy: false,
         hitboxesOnDeath: false,
@@ -5193,6 +5224,8 @@ _buildSettingsPopup() {
     window.startPosSwitcher = data.startPosSwitcher;
     window.showHitboxTrail = data.hitboxTrail;
     this._fpsText.visible = data.showFPS;
+    window.hidePauseBtn = data.hidePauseBtn;
+    window.hidePracticeUI = data.hidePracticeUI;
     window.solidWave = data.solidWaveTrail;
     window.noClipAccuracy = data.noclipAccuracy;
     window.hitboxesOnDeath = data.hitboxesOnDeath;
