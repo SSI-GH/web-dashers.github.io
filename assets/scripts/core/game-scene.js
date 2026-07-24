@@ -4900,7 +4900,6 @@ _buildSettingsPopup() {
         internalString = "";
         updateDisplay();
 
-        // НАШ ФИКС ДЛЯ МОБИЛЬНЫХ СМАРТФОНОВ
         let mobileInput = document.getElementById('phaser-mobile-input');
         if (!mobileInput) {
             mobileInput = document.createElement('input');
@@ -4917,35 +4916,36 @@ _buildSettingsPopup() {
         }
 
         mobileInput.value = "";
-        mobileInput.focus(); // Вызываем клавиатуру телефона
+        mobileInput.focus();
 
         mobileInput.oninput = () => {
             internalString = mobileInput.value;
             updateDisplay();
         };
 
-        // Если пользователь нажал кнопку "Готово/Enter" на телефоне
         mobileInput.onkeydown = (e) => {
             if (e.key === 'Enter') {
-                mobileInput.blur(); // Принудительно закрываем клавиатуру
+                mobileInput.blur();
             }
         };
 
         mobileInput.onblur = () => {
             commitValue();
-            isFocused = false; // Сбрасываем флаг фокуса игры
+            isFocused = false;
             if (mobileInput.parentNode) {
                 mobileInput.parentNode.removeChild(mobileInput);
             }
         };
 
-        // Безопасная защита: клик в любом месте экрана мимо инпута закроет его
-        window.addEventListener('pointerdown', function removeMobileFocus(e) {
+        // Чистый и безопасный способ убрать фокус при клике по экрану
+        const removeMobileFocus = () => {
             if (document.activeElement === mobileInput) {
                 mobileInput.blur();
             }
             window.removeEventListener('pointerdown', removeMobileFocus);
-        });
+        };
+        window.addEventListener('pointerdown', removeMobileFocus);
+    });
 
         const outsideClickListener = () => {
             if (isFocused) commitValue();
