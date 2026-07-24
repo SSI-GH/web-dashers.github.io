@@ -7313,6 +7313,20 @@ _buildSettingsPopup() {
             this._pauseBtn.disableInteractive();
         }
     }
+        // СИНХРОНИЗАЦИЯ СКОРОСТИ МУЗЫКИ СО СПИДХАКОМ
+    const currentSpeed = window.speedHack || 1;
+    if (this._audio) {
+        // Проверяем стандартный объект музыки Phaser, если он спрятан внутри
+        if (this._audio._music && typeof this._audio._music.setRate === 'function') {
+            this._audio._music.setRate(currentSpeed);
+        } else if (this._audio._music && this._audio._music.rate !== undefined) {
+            this._audio._music.rate = currentSpeed;
+        }
+        // Проверяем глобальный контекст звука Phaser
+        if (this.sound && this.sound.rate !== undefined) {
+            this.sound.setRate(currentSpeed);
+        }
+    }
 
     if (window.isEditor) {
         if (this._editorPlaytestActive && !this._editorPlaytestPaused) {
