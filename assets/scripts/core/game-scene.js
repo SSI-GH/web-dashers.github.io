@@ -4924,11 +4924,27 @@ _buildSettingsPopup() {
             updateDisplay();
         };
 
+        // Если пользователь нажал кнопку "Готово/Enter" на телефоне
+        mobileInput.onkeydown = (e) => {
+            if (e.key === 'Enter') {
+                mobileInput.blur(); // Принудительно закрываем клавиатуру
+            }
+        };
+
         mobileInput.onblur = () => {
             commitValue();
-            if (mobileInput.parentNode) mobileInput.parentNode.removeChild(mobileInput);
+            isFocused = false; // Сбрасываем флаг фокуса игры
+            if (mobileInput.parentNode) {
+                mobileInput.parentNode.removeChild(mobileInput);
+            }
         };
-    });
+
+        // Защита: клик по фону игры принудительно закрывает мобильный инпут
+        dim.once('pointerdown', () => {
+            if (document.activeElement === mobileInput) {
+                mobileInput.blur();
+            }
+        });
 
         const outsideClickListener = () => {
             if (isFocused) commitValue();
@@ -5037,12 +5053,12 @@ _buildSettingsPopup() {
         );
 
               // Переносим под спидхак (правая колонка column2X, смещение на 2 шага вниз)
-        createNumberInput(container, column2X, startY + (spacingY * 2), "Respawn Delay (s)",
+        createNumberInput(container, column2X, startY + (spacingY * 1), "Respawn Delay (s)",
             () => window.respawnDelay,
             (v) => { window.respawnDelay = v; }
         );
 
-        createToggle(container, column2X, startY + spacingY, "Practice Music Bypass",
+        createToggle(container, column2X, startY + (spacingY * 2), "Practice Music Bypass",
             () => window.practiceMusicBypass,
             (v) => {
                 const changed = !!window.practiceMusicBypass !== !!v;
