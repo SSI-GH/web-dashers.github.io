@@ -4773,7 +4773,7 @@ _buildSettingsPopup() {
 
         var isOn = getVal();
         var checkTexture = isOn ? "GJ_checkOn_001.png" : "GJ_checkOff_001.png";
-        var check = this.add.image(x + checkOffset, y, "GJ_GameSheet03", checkTexture).setScale(0.8).setInteractive();
+        var check = this.add.image(x + checkOffset, y, "GJ_GameSheet03", checkTexture).setScale(0.6).setInteractive();
         var txt = this.add.bitmapText(x + textOffset, y, "bigFont", label, fontSize).setOrigin(0, 0.5);
         container.add([check, txt]);
 
