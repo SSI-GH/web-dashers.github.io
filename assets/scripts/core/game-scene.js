@@ -7306,6 +7306,13 @@ _buildSettingsPopup() {
     return _0xd8019e * 60;
   }
   update(_0x54fa47, deltaTime) {
+    if (this._pauseBtn) {
+        this._pauseBtn.setAlpha(window.hidePauseBtn ? 0 : (this._paused ? 75 / 255 : 0.75));
+        if (window.hidePauseBtn && this._pauseBtn.input && this._pauseBtn.input.enabled) {
+            this._pauseBtn.disableInteractive();
+        }
+    }
+
     if (window.isEditor) {
         if (this._editorPlaytestActive && !this._editorPlaytestPaused) {
             this._levelEditor._updateEditorPlaytest(deltaTime);
