@@ -7314,7 +7314,8 @@ _buildSettingsPopup() {
         }
     }
         // СИНХРОНИЗАЦИЯ СКОРОСТИ МУЗЫКИ СО СПИДХАКОМ
-    const currentSpeed = window.speedHack || 1;
+    // Компенсируем двойное ускорение аудио
+    const currentSpeed = window.speedHack ? Math.sqrt(window.speedHack) : 1;
     if (this._audio) {
         // Проверяем стандартный объект музыки Phaser, если он спрятан внутри
         if (this._audio._music && typeof this._audio._music.setRate === 'function') {
