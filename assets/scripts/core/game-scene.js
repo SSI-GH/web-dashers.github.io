@@ -7311,27 +7311,29 @@ _buildSettingsPopup() {
     return _0xd8019e * 60;
   }
   update(_0x54fa47, deltaTime) {
+    // НАЧАЛО БЛОКА: Безопасный контроль кнопки паузы
     if (this._pauseBtn) {
         this._pauseBtn.setAlpha(window.hidePauseBtn ? 0 : (this._paused ? 75 / 255 : 0.75));
         if (window.hidePauseBtn && this._pauseBtn.input && this._pauseBtn.input.enabled) {
             this._pauseBtn.disableInteractive();
         }
     }
-        // СИНХРОНИЗАЦИЯ СКОРОСТИ МУЗЫКИ СО СПИДХАКОМ
-    // Компенсируем двойное ускорение аудио
+
+    // ИСПРАВЛЕННЫЙ БЛОК: Безопасная синхронизация музыки без вылетов
     const currentSpeed = window.speedHack ? Math.sqrt(window.speedHack) : 1;
     if (this._audio) {
-        // Проверяем стандартный объект музыки Phaser, если он спрятан внутри
         if (this._audio._music && typeof this._audio._music.setRate === 'function') {
             this._audio._music.setRate(currentSpeed);
         } else if (this._audio._music && this._audio._music.rate !== undefined) {
             this._audio._music.rate = currentSpeed;
         }
-        // Проверяем глобальный контекст звука Phaser
-        if (this.sound && this.sound.rate !== undefined) {
-            this.sound.setRate(currentSpeed);
+        // Защита от ошибки Cannot set properties of null
+        if (this.sound && this.sound !== null && this.sound.rate !== undefined) {
+            this.sound.rate = currentSpeed;
         }
     }
+
+    // ДАЛЬШЕ ИДЕТ СТАРЫЙ КОД ИГРЫ (if (window.isEditor) и т.д.)
 
     if (window.isEditor) {
         if (this._editorPlaytestActive && !this._editorPlaytestPaused) {
