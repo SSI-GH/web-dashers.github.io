@@ -6873,6 +6873,10 @@ _buildSettingsPopup() {
         this._enableDualMode();
       }
       this._level.fastForwardTriggers(pos.x, this._colorManager);
+            if (typeof this._level.updateMoveTriggers === 'function') {
+          const speed = window.speedHack || 1;
+          this._level.updateMoveTriggers(0, speed);
+      }
       if (this._player) {
         this._player._lastCollisionWorldX = Number.isFinite(Number(this._playerWorldX)) ? Number(this._playerWorldX) : null;
         this._player._lastCollisionWorldY = startPosY;
@@ -6887,7 +6891,7 @@ _buildSettingsPopup() {
       this._pauseContainer.destroy();
       this._pauseContainer = null;
     }
-    this._pauseBtn.setVisible(true).setAlpha(75 / 255);
+    this._pauseBtn.setVisible(true).setAlpha(window.hidePauseBtn ? 0 : 75 / 255);
     if (this._practiceModeBarContainer) {
       this._practiceModeBarContainer.setVisible(this._practicedMode && this._practicedMode.practiceMode);
     }
