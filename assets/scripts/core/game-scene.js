@@ -4761,7 +4761,7 @@ _buildSettingsPopup() {
     const column2X = 200;
     const checkOffset = -120;
     const textOffset = -70;
-    const spacingY = 70;
+    const spacingY = 54;
     const startY = -150;
     let pageContainer = this.add.container(0, 0);
     innerContainer.add(pageContainer);
@@ -4779,7 +4779,7 @@ _buildSettingsPopup() {
 
         if (hasInfoBox) {
             if (infoText) {
-                createInfoButton(container, x + checkOffset - 34, y - 30, infoText, 0.45);
+                createInfoButton(container, x + checkOffset - 34, y - 30, infoText, 0.3);
             }
         }
 
