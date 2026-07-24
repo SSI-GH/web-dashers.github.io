@@ -5130,6 +5130,11 @@ _buildSettingsPopup() {
             (v) => { window.useDirectInternet = !v; },
             null, 22
         );
+              // НАШЕ ПОЛЕ ВВОДА: ставим его справа (column2X) в верхний ряд (startY)
+        createNumberInput(container, column2X, startY, "Respawn Delay (s)",
+            () => window.respawnDelay,
+            (v) => { window.respawnDelay = v; }
+        );
     };
 
     const buildPage = (idx) => {
@@ -5180,6 +5185,7 @@ _buildSettingsPopup() {
         showObjectIds: window.showObjectIds,
         showCPS: window.showCPS,
         speedHack: window.speedHack,
+        respawnDelay: window.respawnDelay,
         macroBot: window.macroBot,
         practiceMusicBypass: window.practiceMusicBypass,
         showGlow: window.showGlow,
@@ -5211,6 +5217,7 @@ _buildSettingsPopup() {
         showObjectIds: false,
         showCPS: false,
         speedHack: 1.0,
+        respawnDelay: 1.0,
         macroBot: false,
         practiceMusicBypass: false,
         showGlow: true,
@@ -5236,6 +5243,7 @@ _buildSettingsPopup() {
     window.hitboxesOnDeath = data.hitboxesOnDeath;
     window.showCPS = data.showCPS;
     window.speedHack = data.speedHack;
+    window.respawnDelay = data.respawnDelay;
     window.macroBot = data.macroBot;
     window.practiceMusicBypass = !!data.practiceMusicBypass;
     window.showGlow = data.showGlow;
@@ -7670,7 +7678,7 @@ _buildSettingsPopup() {
         }
       }
       this._deathTimer += deltaTime;
-      let _0x237728 = this._hadNewBest ? 1400 : 1000;
+      let _0x237728 = (this._hadNewBest ? 1400 : 1000) * (window.respawnDelay !== undefined ? window.respawnDelay : 1.0);
       if (this._deathTimer > _0x237728) {
         if (this._practicedMode.practiceMode) {
           this._respawnFromCheckpoint();
