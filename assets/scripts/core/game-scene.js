@@ -4488,18 +4488,21 @@ this._menuUpdateLogBtn = this.add.image(screenWidth - 30 - 50, 33, "GJ_WebSheet"
       this._player2?.setDeathAnimationPaused?.(false);
       this._paused = false;
       this._pauseBtn.setVisible(true).setAlpha(window.hidePauseBtn ? 0 : 75 / 255);
+      
       if (!this._state.isDead || this._practicedMode?.practiceMode) {
         this._audio.resumeMusic();
         this._audio._ensureCorrectMusicMode();
-          if (this._checkpointBtnContainer) {
-      this._checkpointBtnContainer.setAlpha(window.hidePracticeUI ? 0 : 1);
-      }
+        if (this._checkpointBtnContainer) {
+          this._checkpointBtnContainer.setAlpha(window.hidePracticeUI ? 0 : 1);
+        }
+      } // <- ЗАКРЫВАЕТ блок if (!this._state.isDead...)
+
       if (this._pauseContainer) {
         this._pauseContainer.destroy();
         this._pauseContainer = null;
       }
-    }
-  }
+    } // <- ЗАКРЫВАЕТ блок if (this._paused)
+  } // <- ЗАКРЫВАЕТ сам метод _resumeGame()
   _queueGameplayLevelViewReturn() {
     const currentLevelId = window.currentlevel?.[2] ?? window._onlineLevelId ?? null;
     const pendingCreatedReturn = window._createdLevelReturnToView || null;
