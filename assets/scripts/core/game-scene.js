@@ -4887,19 +4887,48 @@ _buildSettingsPopup() {
             if (this._saveSettings) this._saveSettings();
         };
 
-        hitArea.on('pointerdown', (pointer, localX, localY, event) => {
-            if (event) event.stopPropagation();
-            
-            if (window._activeCustomInput && window._activeCustomInput !== commitValue) {
-                window._activeCustomInput();
-            }
+    hitArea.on('pointerdown', (pointer, localX, localY, event) => {
+        if (event) event.stopPropagation();
 
-            isFocused = true;
-            window._activeCustomInput = commitValue;
-            
-            internalString = ""; 
+        if (window._activeCustomInput && window._activeCustomInput !== commitValue) {
+            window._activeCustomInput();
+        }
+
+        isFocused = true;
+        window._activeCustomInput = commitValue;
+
+        internalString = "";
+        updateDisplay();
+
+        // НАШ ФИКС ДЛЯ МОБИЛЬНЫХ СМАРТФОНОВ
+        let mobileInput = document.getElementById('phaser-mobile-input');
+        if (!mobileInput) {
+            mobileInput = document.createElement('input');
+            mobileInput.id = 'phaser-mobile-input';
+            mobileInput.type = 'number';
+            mobileInput.step = '0.1';
+            mobileInput.style.position = 'absolute';
+            mobileInput.style.opacity = '0';
+            mobileInput.style.left = '0px';
+            mobileInput.style.top = '0px';
+            mobileInput.style.width = '1px';
+            mobileInput.style.height = '1px';
+            document.body.appendChild(mobileInput);
+        }
+
+        mobileInput.value = "";
+        mobileInput.focus(); // Вызываем клавиатуру телефона
+
+        mobileInput.oninput = () => {
+            internalString = mobileInput.value;
             updateDisplay();
-        });
+        };
+
+        mobileInput.onblur = () => {
+            commitValue();
+            if (mobileInput.parentNode) mobileInput.parentNode.removeChild(mobileInput);
+        };
+    });
 
         const outsideClickListener = () => {
             if (isFocused) commitValue();
@@ -5005,6 +5034,12 @@ _buildSettingsPopup() {
         createNumberInput(container, column2X, startY, "Speedhack", 
             () => window.speedHack, 
             (v) => window.speedHack = v
+        );
+
+              // Переносим под спидхак (правая колонка column2X, смещение на 2 шага вниз)
+        createNumberInput(container, column2X, startY + (spacingY * 2), "Respawn Delay (s)",
+            () => window.respawnDelay,
+            (v) => { window.respawnDelay = v; }
         );
 
         createToggle(container, column2X, startY + spacingY, "Practice Music Bypass",
@@ -5129,11 +5164,6 @@ _buildSettingsPopup() {
             () => !window.useDirectInternet,
             (v) => { window.useDirectInternet = !v; },
             null, 22
-        );
-              // НАШЕ ПОЛЕ ВВОДА: ставим его справа (column2X) в верхний ряд (startY)
-        createNumberInput(container, column2X, startY, "Respawn Delay (s)",
-            () => window.respawnDelay,
-            (v) => { window.respawnDelay = v; }
         );
     };
 
