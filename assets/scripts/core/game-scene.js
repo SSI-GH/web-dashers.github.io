@@ -4809,7 +4809,7 @@ _buildSettingsPopup() {
         "Show Percentage": "Shows the percentage you are at in a level.",
         "Percentage Decimals": "Shows decimals in level progress.",
         "Hitboxes on Death": "Shows hitboxes upon death in both normal and practice mode.",
-        "Hide Pause Button": "Hides the pause button during gameplay.",
+        "Hide Pause Button": "Hides the pause button during gameplay. Prevents accidental clicks.",
         "Hide Practice UI": "Hides the checkpoint buttons in practice mode.",
     };
 
@@ -4939,11 +4939,12 @@ _buildSettingsPopup() {
             }
         };
 
-        // Защита: клик по фону игры принудительно закрывает мобильный инпут
-        dim.once('pointerdown', () => {
+        // Безопасная защита: клик в любом месте экрана мимо инпута закроет его
+        window.addEventListener('pointerdown', function removeMobileFocus(e) {
             if (document.activeElement === mobileInput) {
                 mobileInput.blur();
             }
+            window.removeEventListener('pointerdown', removeMobileFocus);
         });
 
         const outsideClickListener = () => {
