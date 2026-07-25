@@ -4783,7 +4783,7 @@ _buildSettingsPopup() {
 
         if (hasInfoBox) {
             if (infoText) {
-                createInfoButton(container, x + checkOffset - 34, y - 30, infoText, 0.3);
+                createInfoButton(container, x + checkOffset - 30, y - 25, infoText, 0.3);
             }
         }
 
