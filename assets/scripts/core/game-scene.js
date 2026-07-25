@@ -7404,7 +7404,7 @@ _buildSettingsPopup() {
             this.sound.rate = currentSpeed;
         }
     }
-    // ГЛУБОКАЯ ОПТИМИЗАЦИЯ: Безопасное отключение логики далеких секций
+    // ОПТИМИЗАЦИЯ: Полностью очищенный от констант блок
     this._cullingTimer = (this._cullingTimer || 0) + 1;
     if (this._cullingTimer >= 6) {
         this._cullingTimer = 0;
@@ -7413,10 +7413,8 @@ _buildSettingsPopup() {
             this._level.updateVisibility(this._cameraX);
 
             if (this._level._sectionContainers) {
-                // Избавляемся от const: берем значения напрямую из объекта уровня
                 this._level._sectionContainers.forEach((container, index) => {
                     if (container) {
-                        // Прямая проверка без объявления промежуточных констант
                         container.setActive(index >= this._level._visMinSec && index <= this._level._visMaxSec);
                     }
                 });
