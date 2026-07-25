@@ -5185,24 +5185,26 @@ _buildSettingsPopup() {
         );
               // Наш тумблер 2D-куллинга с защитой от выключения
         createToggle(container, column1X, startY + spacingY, "Render Only Visible",
-            () => window.culling,
-            (v) => { 
-                window.culling = v; 
-                if (!v && this._level && typeof this._level.updateVisibility === 'function') {
-                    this._level._visMinSec = -1; 
-                    this._level.updateVisibility(-999999); 
-                    // Пробуждаем абсолютно все секции обратно
-                    if (this._level._sectionContainers) {
-                        this._level._sectionContainers.forEach(c => { if(c) c.setActive(true); });
-                    }
+        () => window.culling,
+        (v) => {
+            window.culling = v;
+            if (!v && this._level && typeof this._level.updateVisibility === 'function') {
+                this._level._visMinSec = -1;
+                this._level.updateVisibility(-999999);
+                // Пробуждаем абсолютно все секции обратно
+                if (this._level._sectionContainers) {
+                    this._level._sectionContainers.forEach(c => { if (c) c.setActive(true); });
                 }
-            },
+            }
+        }
+    );
+}; // <--- Эта скобка должна закрывать функцию buildAdvancedPage!
 
-    const buildPage = (idx) => {
-        pageContainer.destroy();
-        pageContainer = this.add.container(0, 0);
-        innerContainer.add(pageContainer);
-        pageTitle.setText(pages[idx]);
+const buildPage = (idx) => {
+    pageContainer.destroy();
+    pageContainer = this.add.container(0, 0);
+    innerContainer.add(pageContainer);
+    pageTitle.setText(pages[idx]);
         
         if (idx === 0) buildGameplayPage(pageContainer);
         else if (idx === 1) buildVisualPage(pageContainer);
