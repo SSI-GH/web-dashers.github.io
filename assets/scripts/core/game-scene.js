@@ -4811,6 +4811,7 @@ _buildSettingsPopup() {
         "Hitboxes on Death": "Shows hitboxes upon death in both normal and practice mode.",
         "Hide Pause Button": "Hides the pause button during gameplay. Prevents accidental clicks.",
         "Hide Practice UI": "Hides the checkpoint buttons in practice mode.",
+        "Render Only Visible": "Optimizes performance by rendering only objects within the camera boundaries.",
     };
 
     const createInfoButton = (container, x, y, infoTextOrKey, scale) => {
@@ -5182,6 +5183,18 @@ _buildSettingsPopup() {
             (v) => { window.useDirectInternet = !v; },
             null, 22
         );
+              // Наш тумблер 2D-куллинга с защитой от выключения
+        createToggle(container, column1X, startY + spacingY, "Render Only Visible",
+            () => window.culling,
+            (v) => { 
+                window.culling = v; 
+                if (!v && this._level && typeof this._level.updateVisibility === 'function') {
+                    this._level._visMinSec = -1; 
+                    this._level.updateVisibility(-999999); 
+                }
+            },
+            null, 22, true, "Render Only Visible"
+        );
     };
 
     const buildPage = (idx) => {
@@ -5238,6 +5251,7 @@ _buildSettingsPopup() {
         showGlow: window.showGlow,
         showEditorGlow: window.showEditorGlow,
         useDirectInternet: !!window.useDirectInternet,
+        culling: window.culling,
         enablePortalGuide: window.enablePortalGuide,
         enableOrbGuide: window.enableOrbGuide,
         settingInfoText: window.settingInfoText || {}
@@ -5270,6 +5284,7 @@ _buildSettingsPopup() {
         showGlow: true,
         showEditorGlow: false,
         useDirectInternet: true,
+        culling: false,
         enablePortalGuide: true,
         enableOrbGuide: false
     };
@@ -5301,6 +5316,7 @@ _buildSettingsPopup() {
     window.enableOrbGuide = data.enableOrbGuide;
     window.settingInfoText = data.settingInfoText || {};
     window.useDirectInternet = !!data.useDirectInternet;
+    window.culling = data.culling;
     localStorage.setItem("gd_useDirectInternet", String(!!window.useDirectInternet));
   }
   _buildMacroPopup() {
@@ -7385,6 +7401,15 @@ _buildSettingsPopup() {
         // Защита от ошибки Cannot set properties of null
         if (this.sound && this.sound !== null && this.sound.rate !== undefined) {
             this.sound.rate = currentSpeed;
+        }
+    }
+        // ОПТИМИЗАЦИЯ: Culling с пропуском кадров (Throttling)
+    this._cullingTimer = (this._cullingTimer || 0) + 1;
+    if (this._cullingTimer >= 6) {
+        this._cullingTimer = 0;
+        
+        if (window.culling && this._level && typeof this._level.updateVisibility === 'function') {
+            this._level.updateVisibility(this._cameraX);
         }
     }
 
