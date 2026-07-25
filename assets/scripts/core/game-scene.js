@@ -7404,7 +7404,7 @@ _buildSettingsPopup() {
             this.sound.rate = currentSpeed;
         }
     }
-    // ГЛУБОКАЯ ОПТИМИЗАЦИЯ: Отключение логики невидимых секций уровня
+    // ГЛУБОКАЯ ОПТИМИЗАЦИЯ: Безопасное отключение логики далеких секций
     this._cullingTimer = (this._cullingTimer || 0) + 1;
     if (this._cullingTimer >= 6) {
         this._cullingTimer = 0;
@@ -7412,16 +7412,12 @@ _buildSettingsPopup() {
         if (window.culling && this._level && typeof this._level.updateVisibility === 'function') {
             this._level.updateVisibility(this._cameraX);
 
-            // Пробегаемся по всем секциям уровня и усыпляем невидимые
             if (this._level._sectionContainers) {
-                const minSec = this._level._visMinSec;
-                const maxSec = this._level._visMaxSec;
-
+                // Избавляемся от const: берем значения напрямую из объекта уровня
                 this._level._sectionContainers.forEach((container, index) => {
                     if (container) {
-                        const isVisible = index >= minSec && index <= maxSec;
-                        // Выключаем активность (CPU) и видимость (GPU) для далеких секций
-                        container.setActive(isVisible);
+                        // Прямая проверка без объявления промежуточных констант
+                        container.setActive(index >= this._level._visMinSec && index <= this._level._visMaxSec);
                     }
                 });
             }
