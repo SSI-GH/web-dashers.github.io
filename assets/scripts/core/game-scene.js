@@ -5191,11 +5191,12 @@ _buildSettingsPopup() {
                 if (!v && this._level && typeof this._level.updateVisibility === 'function') {
                     this._level._visMinSec = -1; 
                     this._level.updateVisibility(-999999); 
+                    // Пробуждаем абсолютно все секции обратно
+                    if (this._level._sectionContainers) {
+                        this._level._sectionContainers.forEach(c => { if(c) c.setActive(true); });
+                    }
                 }
             },
-            null, 22, true, "Render Only Visible"
-        );
-    };
 
     const buildPage = (idx) => {
         pageContainer.destroy();
@@ -7403,13 +7404,27 @@ _buildSettingsPopup() {
             this.sound.rate = currentSpeed;
         }
     }
-        // ОПТИМИЗАЦИЯ: Culling с пропуском кадров (Throttling)
+    // ГЛУБОКАЯ ОПТИМИЗАЦИЯ: Отключение логики невидимых секций уровня
     this._cullingTimer = (this._cullingTimer || 0) + 1;
     if (this._cullingTimer >= 6) {
         this._cullingTimer = 0;
         
         if (window.culling && this._level && typeof this._level.updateVisibility === 'function') {
             this._level.updateVisibility(this._cameraX);
+
+            // Пробегаемся по всем секциям уровня и усыпляем невидимые
+            if (this._level._sectionContainers) {
+                const minSec = this._level._visMinSec;
+                const maxSec = this._level._visMaxSec;
+
+                this._level._sectionContainers.forEach((container, index) => {
+                    if (container) {
+                        const isVisible = index >= minSec && index <= maxSec;
+                        // Выключаем активность (CPU) и видимость (GPU) для далеких секций
+                        container.setActive(isVisible);
+                    }
+                });
+            }
         }
     }
 
