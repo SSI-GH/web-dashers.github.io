@@ -7383,7 +7383,7 @@ _buildSettingsPopup() {
         }
     }
 
-if (this._level && !window.isEditor && this._audio) {
+if (this._audio) {
     const currentSpeed = window.speedhack ? Math.sqrt(window.speedhack) : 1;
 
     if (this._audio._music && typeof this._audio._music.setRate === 'function') {
