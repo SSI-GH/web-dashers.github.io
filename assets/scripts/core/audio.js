@@ -270,7 +270,7 @@ class AudioManager {
     source.buffer = audioBuffer;
     source.loop = true;
 try {
-    const currentSpeed = window.SpeedHack || 1;
+    const currentSpeed = window.speedhack ? Math.sqrt(window.speedhack) : 1;
     if (source && source.playbackRate) {
         source.playbackRate.value = currentSpeed;
     }
