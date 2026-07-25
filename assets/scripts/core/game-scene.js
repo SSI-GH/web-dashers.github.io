@@ -4937,7 +4937,6 @@ _buildSettingsPopup() {
             }
         };
 
-        // Чистый и безопасный способ убрать фокус при клике по экрану
         const removeMobileFocus = () => {
             if (document.activeElement === mobileInput) {
                 mobileInput.blur();
@@ -5053,7 +5052,6 @@ _buildSettingsPopup() {
             (v) => window.speedHack = v
         );
 
-              // Переносим под спидхак (правая колонка column2X, смещение на 2 шага вниз)
         createNumberInput(container, column2X, startY + (spacingY * 1), "Respawn Delay (s)",
             () => window.respawnDelay,
             (v) => { window.respawnDelay = v; }
@@ -5076,7 +5074,7 @@ _buildSettingsPopup() {
     };
 
     const buildVisualPage = (container) => {
-        const spacingY = 54; // Уменьшаем вертикальный шаг для всей вкладки
+        const spacingY = 54; 
         createToggle(container, column1X, startY, "Show Hitboxes", 
             () => window.showHitboxes, 
             (v) => window.showHitboxes = v,
@@ -5152,7 +5150,6 @@ _buildSettingsPopup() {
             true,
             "Enable Orb Guide"
         );
-        // Чекбокс для скрытия кнопки паузы с мгновенным обновлением на экране
         createToggle(container, column2X, startY + (spacingY * 5), "Hide Pause Button", 
             () => window.hidePauseBtn, 
             (v) => { 
@@ -5163,8 +5160,6 @@ _buildSettingsPopup() {
             },
             null, 25, true, "Hide Pause Button"
         );
-
-        // Чекбокс для скрытия кнопок практики с мгновенным обновлением на экране
         createToggle(container, column2X, startY + (spacingY * 6), "Hide Practice UI", 
             () => window.hidePracticeUI, 
             (v) => { 
@@ -6013,6 +6008,9 @@ _buildSettingsPopup() {
       }
       this._updateLogPopup.destroy();
       this._updateLogPopup = null;
+    }
+    if (this.sound && this.sound.context && this.sound.context.state === 'suspended') {
+        this.sound.context.resume().catch(err => console.warn(err));
     }
   }
   _buildNewgroundsPopup() {
@@ -7366,7 +7364,6 @@ _buildSettingsPopup() {
     return _0xd8019e * 60;
   }
   update(_0x54fa47, deltaTime) {
-    // НАЧАЛО БЛОКА: Безопасный контроль кнопки паузы
     if (this._pauseBtn) {
         this._pauseBtn.setAlpha(window.hidePauseBtn ? 0 : (this._paused ? 75 / 255 : 0.75));
         if (window.hidePauseBtn && this._pauseBtn.input && this._pauseBtn.input.enabled) {
@@ -7388,7 +7385,7 @@ _buildSettingsPopup() {
         }
     }
 
-    // ДАЛЬШЕ ИДЕТ СТАРЫЙ КОД ИГРЫ (if (window.isEditor) и т.д.)
+
 
     if (window.isEditor) {
         if (this._editorPlaytestActive && !this._editorPlaytestPaused) {
