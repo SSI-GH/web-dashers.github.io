@@ -7383,16 +7383,9 @@ _buildSettingsPopup() {
         }
     }
 
-if (this._audio) {
+if (this._level && !window.isEditor && this._audio) {
     const currentSpeed = window.speedhack ? Math.sqrt(window.speedhack) : 1;
-
-    if (this._audio._music && typeof this._audio._music.setRate === 'function') {
-        this._audio._music.setRate(currentSpeed);
-    }
-
-    if (this._audio._onlineSource && this._audio._onlineSource.playbackRate) {
-        this._audio._onlineSource.playbackRate.value = currentSpeed;
-    }
+    this._audio._music.setRate(currentSpeed);
 }
 
     if (window.isEditor) {
