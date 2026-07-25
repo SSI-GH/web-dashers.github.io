@@ -4764,7 +4764,7 @@ _buildSettingsPopup() {
     const column1X = -200;
     const column2X = 200;
     const checkOffset = -120;
-    const textOffset = -90;
+    const textOffset = -80;
     const spacingY = 54;
     const startY = -150;
     let pageContainer = this.add.container(0, 0);
