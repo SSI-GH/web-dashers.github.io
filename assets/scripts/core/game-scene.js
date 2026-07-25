@@ -7374,15 +7374,15 @@ _buildSettingsPopup() {
         }
     }
 
-    // ИСПРАВЛЕННЫЙ БЛОК: Безопасная синхронизация музыки без вылетов
-    const currentSpeed = window.speedHack ? Math.sqrt(window.speedHack) : 1;
-    if (this._audio) {
+    if (this._level && !window.isEditor && this._audio) {
+        const currentSpeed = window.speedHack ? Math.sqrt(window.speedHack) : 1;
+        
         if (this._audio._music && typeof this._audio._music.setRate === 'function') {
             this._audio._music.setRate(currentSpeed);
         } else if (this._audio._music && this._audio._music.rate !== undefined) {
             this._audio._music.rate = currentSpeed;
         }
-        // Защита от ошибки Cannot set properties of null
+        
         if (this.sound && this.sound !== null && this.sound.rate !== undefined) {
             this.sound.rate = currentSpeed;
         }
