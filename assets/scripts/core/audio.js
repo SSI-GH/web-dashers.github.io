@@ -314,6 +314,13 @@ try {
       },
       resume: () => {
         if (!_isPaused) return;
+
+        const currentLevelOffset = typeof self._scene._getCurrentMusicSyncOffset === "function"
+          ? self._scene._getCurrentMusicSyncOffset()
+          : (typeof self._scene._getStartPosMusicOffset === "function" ? self._scene._getStartPosMusicOffset() : 0);
+
+        const exactOffset = Math.max(0, Math.min(currentLevelOffset, audioBuffer.duration - 0.01));
+
         const newSrc = ctx.createBufferSource();
         newSrc.buffer = audioBuffer;
         newSrc.loop = true;
@@ -324,12 +331,11 @@ try {
           if (newSrc.playbackRate) {
             newSrc.playbackRate.value = currentSpeed;
           }
-        } catch (e) {
-          console.error("CustomMusic Err", e);
-        }
+        } catch (e) {}
         
-        newSrc.start(0, _pauseOffset);
-        self._onlineSource = newSrc; // SaveLink
+        newSrc.start(0, exactOffset);
+        self._onlineSource = newSrc;
+        _pauseOffset = exactOffset;
         _startedAt  = ctx.currentTime;
         _isPlaying  = true;
         _isPaused   = false;
@@ -341,6 +347,7 @@ try {
 
     this._music = musicObj;
   }
+
   startMenuMusic() {
     if (this._music) {
       this._music.stop();
