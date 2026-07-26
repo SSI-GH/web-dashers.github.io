@@ -17,7 +17,6 @@ class AudioManager {
     this._pendingOnlineSongLoadKey = null;
     this._pendingOnlineSongLoadOffset = 0;
     this._pendingOnlineSongFadeDuration = null;
-    this._lastSpeedhack = window.speedhack ? Math.sqrt(window.speedhack) : 1;
   }
   _effectiveVolume() {
     return this._userMusicVol * 0.8;
@@ -264,29 +263,20 @@ class AudioManager {
     if (ctx.state === 'suspended') { ctx.resume(); }
     const gainNode = ctx.createGain();
     gainNode.gain.value = this._effectiveVolume();
-    const dest = soundMgr.destination || soundMgr.masterVolumeNode || ctx.destination;
-    
-    if (soundMgr.masterTweenNode) {
-      gainNode.connect(soundMgr.masterTweenNode);
-    } else {
+    const dest = soundMgr.masterVolumeNode || soundMgr.destination || ctx.destination;
     gainNode.connect(dest);
-
     const safeOffset = Math.max(0, Math.min(startOffset, audioBuffer.duration - 0.01));
     const source = ctx.createBufferSource();
     source.buffer = audioBuffer;
     source.loop = true;
-
-    try {
-        const currentSpeed = window.speedhack ? Number(window.speedhack) : 1;
-        if (source && source.playbackRate) {
-            source.playbackRate.value = currentSpeed;
-        }
-    } catch (e) {
-        console.error("Ошибка применения СпидХака:", e);
+try {
+    const currentSpeed = window.speedhack ? Math.sqrt(window.speedhack) : 1;
+    if (source && source.playbackRate) {
+        source.playbackRate.value = currentSpeed;
     }
-
-    source.connect(gainNode);
-
+} catch (e) {
+    console.error("Ошибка применения СпидХака к кастомной музыке:", e);
+}
     source.connect(gainNode);
     source.start(0, safeOffset);
     this._onlineSource = source;
@@ -323,28 +313,12 @@ class AudioManager {
       },
       resume: () => {
         if (!_isPaused) return;
-
-        const currentLevelOffset = typeof self._scene._getCurrentMusicSyncOffset === "function"
-          ? self._scene._getCurrentMusicSyncOffset()
-          : (typeof self._scene._getStartPosMusicOffset === "function" ? self._scene._getStartPosMusicOffset() : 0);
-
-        const exactOffset = Math.max(0, Math.min(currentLevelOffset, audioBuffer.duration - 0.01));
-
         const newSrc = ctx.createBufferSource();
         newSrc.buffer = audioBuffer;
         newSrc.loop = true;
         newSrc.connect(gainNode);
-        
-        try {
-          const currentSpeed = window.speedhack ? Math.sqrt(window.speedhack) : 1;
-          if (newSrc.playbackRate) {
-            newSrc.playbackRate.value = currentSpeed;
-          }
-        } catch (e) {}
-        
-        newSrc.start(0, exactOffset);
+        newSrc.start(0, _pauseOffset);
         self._onlineSource = newSrc;
-        _pauseOffset = exactOffset;
         _startedAt  = ctx.currentTime;
         _isPlaying  = true;
         _isPaused   = false;
@@ -356,7 +330,6 @@ class AudioManager {
 
     this._music = musicObj;
   }
-
   startMenuMusic() {
     if (this._music) {
       this._music.stop();
@@ -516,26 +489,11 @@ class AudioManager {
     }
   }
   update(timeSeconds) {
-    const currentSpeed = window.speedhack ? Math.sqrt(window.speedhack) : 1;
-    
-    if (Math.abs(this._lastSpeedhack - currentSpeed) > 0.01) {
-      this._lastSpeedhack = currentSpeed;
-      
-      if (this._onlineSource && window._onlineSongBuffer) {
-        const offset = typeof this._scene._getCurrentMusicSyncOffset === "function"
-          ? this._scene._getCurrentMusicSyncOffset()
-          : (typeof this._scene._getStartPosMusicOffset === "function" ? this._scene._getStartPosMusicOffset() : 0);
-          
-        this.startMusic(offset);
-      }
-    }
-
     if (!this._meteringEnabled || !this._analyser) {
       return;
     }
     this._analyser.getFloatTimeDomainData(this._meterBuffer);
-    
-    let biggestBuf = 0; 
+    let biggestBuf = 0;
     for (let index = 0; index < this._meterBuffer.length; index++) {
       let buf = Math.abs(this._meterBuffer[index]);
       if (buf > biggestBuf) {
