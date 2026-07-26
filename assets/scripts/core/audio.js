@@ -264,39 +264,28 @@ class AudioManager {
     if (ctx.state === 'suspended') { ctx.resume(); }
     const gainNode = ctx.createGain();
     gainNode.gain.value = this._effectiveVolume();
-    const dest = soundMgr.masterVolumeNode || soundMgr.destination || ctx.destination;
+    const dest = soundMgr.destination || soundMgr.masterVolumeNode || ctx.destination;
+    
+    if (soundMgr.masterTweenNode) {
+      gainNode.connect(soundMgr.masterTweenNode);
+    } else {
     gainNode.connect(dest);
 
-    const currentSpeed = window.speedhack ? Math.sqrt(window.speedhack) : 1;
-    let finalBuffer = audioBuffer;
+    const safeOffset = Math.max(0, Math.min(startOffset, audioBuffer.duration - 0.01));
+    const source = ctx.createBufferSource();
+    source.buffer = audioBuffer;
+    source.loop = true;
 
-    if (Math.abs(currentSpeed - 1) > 0.01 && typeof ctx.createBuffer === "function") {
-      try {
-        const oldRate = audioBuffer.sampleRate;
-        const newRate = oldRate * currentSpeed; 
-        
-        const resampledBuffer = ctx.createBuffer(
-          audioBuffer.numberOfChannels,
-          audioBuffer.length,
-          newRate
-        );
-        
-        for (let ch = 0; ch < audioBuffer.numberOfChannels; ch++) {
-          resampledBuffer.copyToChannel(audioBuffer.getChannelData(ch), ch);
+    try {
+        const currentSpeed = window.speedhack ? Number(window.speedhack) : 1;
+        if (source && source.playbackRate) {
+            source.playbackRate.value = currentSpeed;
         }
-        finalBuffer = resampledBuffer;
-        
-        startOffset = startOffset / currentSpeed;
-      } catch (e) {
-        console.error("Критическая ошибка передискретизации звука:", e);
-        finalBuffer = audioBuffer;
-      }
+    } catch (e) {
+        console.error("Ошибка применения СпидХака:", e);
     }
 
-    const safeOffset = Math.max(0, Math.min(startOffset, finalBuffer.duration - 0.01));
-    const source = ctx.createBufferSource();
-    source.buffer = finalBuffer; 
-    source.loop = true;
+    source.connect(gainNode);
 
     source.connect(gainNode);
     source.start(0, safeOffset);
