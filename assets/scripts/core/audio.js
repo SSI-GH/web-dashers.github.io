@@ -17,6 +17,7 @@ class AudioManager {
     this._pendingOnlineSongLoadKey = null;
     this._pendingOnlineSongLoadOffset = 0;
     this._pendingOnlineSongFadeDuration = null;
+    this._lastSpeedhack = window.speedhack ? Math.sqrt(window.speedhack) : 1;
   }
   _effectiveVolume() {
     return this._userMusicVol * 0.8;
@@ -499,14 +500,17 @@ try {
     }
   }
   update(timeSeconds) {
-    if (this._onlineSource && this._onlineSource.playbackRate) {
-      try {
-        const targetSpeed = window.speedhack ? Math.sqrt(window.speedhack) : 1;
-        if (Math.abs(this._onlineSource.playbackRate.value - targetSpeed) > 0.01) {
-          this._onlineSource.playbackRate.value = targetSpeed;
-        }
-      } catch (e) {
-        console.error("Не удалось обновить скорость кастомного трека:", e);
+    const currentSpeed = window.speedhack ? Math.sqrt(window.speedhack) : 1;
+    
+    if (Math.abs(this._lastSpeedhack - currentSpeed) > 0.01) {
+      this._lastSpeedhack = currentSpeed;
+      
+      if (this._onlineSource && window._onlineSongBuffer) {
+        const offset = typeof this._scene._getCurrentMusicSyncOffset === "function"
+          ? this._scene._getCurrentMusicSyncOffset()
+          : (typeof this._scene._getStartPosMusicOffset === "function" ? this._scene._getStartPosMusicOffset() : 0);
+          
+        this.startMusic(offset);
       }
     }
 
