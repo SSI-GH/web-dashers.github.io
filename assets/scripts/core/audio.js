@@ -317,8 +317,18 @@ try {
         newSrc.buffer = audioBuffer;
         newSrc.loop = true;
         newSrc.connect(gainNode);
+        
+        try {
+          const currentSpeed = window.speedhack ? Math.sqrt(window.speedhack) : 1;
+          if (newSrc.playbackRate) {
+            newSrc.playbackRate.value = currentSpeed;
+          }
+        } catch (e) {
+          console.error("CustomMusic Err", e);
+        }
+        
         newSrc.start(0, _pauseOffset);
-        self._onlineSource = newSrc;
+        self._onlineSource = newSrc; // SaveLink
         _startedAt  = ctx.currentTime;
         _isPlaying  = true;
         _isPaused   = false;
@@ -489,15 +499,15 @@ try {
     }
   }
   update(timeSeconds) {
-    if (!this._meteringEnabled || !this._analyser) {
-      return;
-    }
-    this._analyser.getFloatTimeDomainData(this._meterBuffer);
-    let biggestBuf = 0;
-    for (let index = 0; index < this._meterBuffer.length; index++) {
-      let buf = Math.abs(this._meterBuffer[index]);
-      if (buf > biggestBuf) {
-        biggestBuf = buf;
+    if (this._onlineSource && this._onlineSource.playbackRate) {
+      try {
+        const targetSpeed = window.speedhack ? Math.sqrt(window.speedhack) : 1;
+        
+        if (Math.abs(this._onlineSource.playbackRate.value - targetSpeed) > 0.01) {
+          this._onlineSource.playbackRate.value = targetSpeed;
+        }
+      } catch (e) {
+        console.error("Не удалось обновить скорость кастомного трека:", e);
       }
     }
     const volume = this._effectiveVolume();
