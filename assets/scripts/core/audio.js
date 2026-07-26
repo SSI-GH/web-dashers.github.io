@@ -266,18 +266,38 @@ class AudioManager {
     gainNode.gain.value = this._effectiveVolume();
     const dest = soundMgr.masterVolumeNode || soundMgr.destination || ctx.destination;
     gainNode.connect(dest);
-    const safeOffset = Math.max(0, Math.min(startOffset, audioBuffer.duration - 0.01));
-    const source = ctx.createBufferSource();
-    source.buffer = audioBuffer;
-    source.loop = true;
-try {
+
     const currentSpeed = window.speedhack ? Math.sqrt(window.speedhack) : 1;
-    if (source && source.playbackRate) {
-        source.playbackRate.value = currentSpeed;
+    let finalBuffer = audioBuffer;
+
+    if (Math.abs(currentSpeed - 1) > 0.01 && typeof ctx.createBuffer === "function") {
+      try {
+        const oldRate = audioBuffer.sampleRate;
+        const newRate = oldRate * currentSpeed; 
+        
+        const resampledBuffer = ctx.createBuffer(
+          audioBuffer.numberOfChannels,
+          audioBuffer.length,
+          newRate
+        );
+        
+        for (let ch = 0; ch < audioBuffer.numberOfChannels; ch++) {
+          resampledBuffer.copyToChannel(audioBuffer.getChannelData(ch), ch);
+        }
+        finalBuffer = resampledBuffer;
+        
+        startOffset = startOffset / currentSpeed;
+      } catch (e) {
+        console.error("Критическая ошибка передискретизации звука:", e);
+        finalBuffer = audioBuffer;
+      }
     }
-} catch (e) {
-    console.error("Ошибка применения СпидХака к кастомной музыке:", e);
-}
+
+    const safeOffset = Math.max(0, Math.min(startOffset, finalBuffer.duration - 0.01));
+    const source = ctx.createBufferSource();
+    source.buffer = finalBuffer; 
+    source.loop = true;
+
     source.connect(gainNode);
     source.start(0, safeOffset);
     this._onlineSource = source;
